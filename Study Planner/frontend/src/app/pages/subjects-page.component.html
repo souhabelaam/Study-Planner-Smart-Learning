@@ -1,0 +1,45 @@
+<div class="app-shell">
+  <h1 class="page-title">Subjects</h1>
+  <p class="page-subtitle">Manage your subjects and reuse them in sessions.</p>
+  @if (message) {
+  <div class="alert alert-success mb-4">{{ message }}</div>
+  }
+  @if (error) {
+  <div class="alert alert-danger mb-4">{{ error }}</div>
+  }
+  <div class="app-card mb-4">
+    <div class="d-flex gap-2 align-end">
+      <input class="form-control" [(ngModel)]="newName" placeholder="Subject name" />
+      <button class="btn-primary" type="button" (click)="create()">Add</button>
+    </div>
+  </div>
+  <div class="app-card mb-4">
+    <p class="card-title">Bulk add subjects</p>
+    <p class="text-muted">Paste a list. Duplicates will be ignored.</p>
+    <div class="form-shell">
+      <textarea class="form-control" [(ngModel)]="bulkNames" placeholder="Example: Math, Physics&#10;or one per line"></textarea>
+      <button class="btn-primary w-fit" type="button" (click)="quickAdd()">Add list</button>
+    </div>
+  </div>
+  <div class="app-card">
+    @if (!subjects.length) {
+    <p class="text-muted">Aucune matiere.</p>
+    } @else {
+    <table class="app-table">
+      <thead>
+        <tr><th>Nom</th><th class="text-end">Actions</th></tr>
+      </thead>
+      <tbody>
+        @for (subject of subjects; track subject.id) {
+        <tr>
+          <td>{{ subject.name }}</td>
+          <td class="text-end">
+            <button class="btn-outline-danger" type="button" (click)="deleteSubject(subject.id)">Supprimer</button>
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+    }
+  </div>
+</div>

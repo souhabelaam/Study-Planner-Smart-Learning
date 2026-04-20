@@ -1,0 +1,39 @@
+<div class="app-shell">
+  <h1 class="page-title">Dashboard</h1>
+  <p class="page-subtitle">Overview of your study activity and AI insights.</p>
+  <div class="app-grid">
+    <div class="app-card">
+      <p class="card-title">Subjects</p>
+      <p class="metric">{{ subjectCount }}</p>
+    </div>
+    <div class="app-card">
+      <p class="card-title">Sessions</p>
+      <p class="metric">{{ sessionCount }}</p>
+    </div>
+    <div class="app-card">
+      <p class="card-title">AI score</p>
+      <p class="metric">{{ score }}</p>
+    </div>
+  </div>
+
+  <div class="app-card mt-3 chart-card">
+    <div class="d-flex align-center space-between">
+      <p class="card-title mb-0">Daily study time (7 days)</p>
+      <span class="tag">AI insight</span>
+    </div>
+    <div class="chart-wrap">
+      <canvas #dailyCanvas></canvas>
+    </div>
+  </div>
+
+  @if (report) {
+  <div class="app-card mt-3">
+    <p class="card-title">AI suggestions</p>
+    <ul class="tips-list">
+      @for (tip of report.suggestions; track tip) {
+      <li>{{ tip }}</li>
+      }
+    </ul>
+  </div>
+  }
+</div>

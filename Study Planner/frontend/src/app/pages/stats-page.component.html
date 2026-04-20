@@ -1,0 +1,42 @@
+<div class="app-shell">
+  <h1 class="page-title">Analytics</h1>
+  <p class="page-subtitle">Track trends, progress, and AI-generated insights.</p>
+  <div class="app-grid mb-4">
+    <div class="app-card">
+      <p class="card-title">Last 7 days</p>
+      <div class="chart-wrap">
+        <canvas #dailyCanvas></canvas>
+      </div>
+    </div>
+    <div class="app-card">
+      <p class="card-title">Last 8 weeks</p>
+      <div class="chart-wrap">
+        <canvas #weeklyCanvas></canvas>
+      </div>
+    </div>
+  </div>
+  @if (report) {
+  <div class="app-card">
+    <p class="card-title">AI analysis</p>
+    <div class="app-grid compact-grid">
+      <div>
+        <p class="metric-sm">{{ report.mostActiveHour }}h</p>
+        <p class="text-muted">Most active hour</p>
+      </div>
+      <div>
+        <p class="metric-sm">{{ report.consistencyScore }}</p>
+        <p class="text-muted">Consistency score /10</p>
+      </div>
+      <div>
+        <p class="metric-sm">{{ report.productivityScore }}</p>
+        <p class="text-muted">Productivity score /10</p>
+      </div>
+    </div>
+    <ul class="tips-list">
+      @for (tip of report.suggestions; track tip) {
+      <li>{{ tip }}</li>
+      }
+    </ul>
+  </div>
+  }
+</div>

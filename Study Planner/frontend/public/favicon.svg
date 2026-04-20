@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Study Planner">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#4f46e5"/>
+      <stop offset="100%" stop-color="#10b981"/>
+    </linearGradient>
+  </defs>
+  <rect x="4" y="4" width="56" height="56" rx="14" fill="url(#g)"/>
+  <path d="M18 20h18a8 8 0 0 1 8 8v16H26a8 8 0 0 0-8 8V20z" fill="#ffffff" opacity="0.92"/>
+  <path d="M44 44H26a8 8 0 0 0-8 8h18a8 8 0 0 0 8-8z" fill="#dbeafe"/>
+  <circle cx="40" cy="26" r="4" fill="#10b981"/>
+</svg>

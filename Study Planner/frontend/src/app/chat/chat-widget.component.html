@@ -1,0 +1,30 @@
+<div class="chat-shell" [class.is-open]="open" [class.is-collapsed]="collapsed" role="dialog" aria-label="IA Helper chat">
+    <div class="chat-header" (click)="toggleCollapsed()">
+      <div>
+        <div class="chat-title">IA Helper</div>
+        <div class="chat-subtitle">{{ collapsed ? 'Tap to reopen' : 'Quick study help' }}</div>
+      </div>
+      <button type="button" class="icon-btn" (click)="closePanel($event)" aria-label="Close chat">
+        <span class="icon" aria-hidden="true">✕</span>
+      </button>
+    </div>
+
+    <div class="chat-body">
+      @for (m of messages; track m) {
+        <div class="chat-row" [class.is-user]="m.role === 'user'">
+          <div class="chat-bubble">{{ m.content }}</div>
+        </div>
+      }
+      @if (loading) {
+        <div class="chat-row">
+          <div class="chat-bubble">Thinking…</div>
+        </div>
+      }
+    </div>
+
+    <div class="chat-footer">
+      <input class="form-control" [(ngModel)]="draft" (keydown.enter)="send()" placeholder="Type your message…" />
+      <button class="btn-primary" type="button" (click)="send()" [disabled]="loading">Send</button>
+    </div>
+  </div>
+

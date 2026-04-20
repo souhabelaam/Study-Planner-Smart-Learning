@@ -1,0 +1,56 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: study-planner-mysql
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: studyplanner
+      MYSQL_USER: studyplanner
+      MYSQL_PASSWORD: studyplanner
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - study-planner-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    command: --default-authentication-plugin=mysql_native_password
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: study-planner-app
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root
+      APP_JWT_SECRET: ${APP_JWT_SECRET:-MY_SECRET_KEY_2025}
+      APP_JWT_EXPIRATION: ${APP_JWT_EXPIRATION:-3600000}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - study-planner-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  mysql_data:
+    driver: local
+
+networks:
+  study-planner-network:
+    driver: bridge

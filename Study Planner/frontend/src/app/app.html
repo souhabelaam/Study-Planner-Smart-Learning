@@ -1,0 +1,53 @@
+<header class="app-navbar">
+  <div class="brand">
+    <span class="brand-pill">Smart Learning</span>
+    <span class="brand-text">Study Planner</span>
+  </div>
+  <nav class="nav-links">
+    @if (authService.isLoggedIn()) {
+      <a routerLink="/dashboard" routerLinkActive="is-active" class="nav-link-item">Dashboard</a>
+      <a routerLink="/subjects" routerLinkActive="is-active" class="nav-link-item">Subjects</a>
+      <a routerLink="/sessions" routerLinkActive="is-active" class="nav-link-item">Sessions</a>
+      <a routerLink="/stats" routerLinkActive="is-active" class="nav-link-item">Analytics</a>
+      <button class="icon-btn" type="button" (click)="toggleTheme()" [attr.aria-label]="themeService.getTheme() === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'">
+        @if (themeService.getTheme() === 'dark') {
+          <span class="icon" aria-hidden="true">☀</span>
+        } @else {
+          <span class="icon" aria-hidden="true">☾</span>
+        }
+      </button>
+      <button class="icon-btn chat-btn" type="button" (click)="toggleChat()" aria-label="Open IA Helper chat">
+        <span class="badge" *ngIf="chatUnread > 0">{{ chatUnread }}</span>
+        <svg class="svg-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            fill="currentColor"
+            d="M20 2H4a2 2 0 0 0-2 2v18l4-4h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2Zm0 14H5.17L4 17.17V4h16v12Z"
+          />
+        </svg>
+      </button>
+      <button class="btn-ghost" type="button" (click)="logout()">Logout</button>
+    } @else {
+      <a routerLink="/login" routerLinkActive="is-active" class="nav-link-item">Login</a>
+      <a routerLink="/register" routerLinkActive="is-active" class="nav-link-item">Register</a>
+      <button class="icon-btn" type="button" (click)="toggleTheme()" [attr.aria-label]="themeService.getTheme() === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'">
+        @if (themeService.getTheme() === 'dark') {
+          <span class="icon" aria-hidden="true">☀</span>
+        } @else {
+          <span class="icon" aria-hidden="true">☾</span>
+        }
+      </button>
+    }
+  </nav>
+</header>
+
+<main>
+  <router-outlet />
+</main>
+
+@if (authService.isLoggedIn()) {
+  <app-chat-widget
+    [open]="chatOpen"
+    (close)="chatOpen = false"
+    (assistantMessage)="onAssistantMessage()"
+  />
+}
