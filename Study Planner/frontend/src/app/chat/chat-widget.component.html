@@ -9,7 +9,7 @@
       </button>
     </div>
 
-    <div class="chat-body">
+    <div class="chat-body" #chatBody>
       @for (m of messages; track m) {
         <div class="chat-row" [class.is-user]="m.role === 'user'">
           <div class="chat-bubble">{{ m.content }}</div>
@@ -23,8 +23,8 @@
     </div>
 
     <div class="chat-footer">
-      <input class="form-control" [(ngModel)]="draft" (keydown.enter)="send()" placeholder="Type your message…" />
-      <button class="btn-primary" type="button" (click)="send()" [disabled]="loading">Send</button>
+      <input class="form-control" [(ngModel)]="draft" (keydown.enter)="send()" placeholder="Type your message…" [disabled]="loading" />
+      <button class="btn-primary" type="button" (click)="send()" [disabled]="loading || !draft.trim()">Send</button>
     </div>
   </div>
 

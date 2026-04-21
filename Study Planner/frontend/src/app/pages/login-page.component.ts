@@ -1,4 +1,5 @@
 import { Component, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../core/auth.service';
@@ -6,7 +7,7 @@ import { AuthService } from '../core/auth.service';
 @Component({
   standalone: true,
   selector: 'app-login-page',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './login-page.component.html'
 })
 export class LoginPageComponent {
@@ -16,11 +17,16 @@ export class LoginPageComponent {
 
   error = '';
   loading = false;
+  showPassword = false;
 
   form = this.fb.group({
     username: ['', Validators.required],
     password: ['', Validators.required]
   });
+
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
+  }
 
   submit(): void {
     if (this.form.invalid || this.loading) {

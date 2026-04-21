@@ -4,7 +4,7 @@ services:
     container_name: study-planner-mysql
     restart: unless-stopped
     ports:
-      - "3306:3306"
+      - "3307:3306"
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: studyplanner
@@ -37,6 +37,9 @@ services:
       MYSQL_PASSWORD: root
       APP_JWT_SECRET: ${APP_JWT_SECRET:-MY_SECRET_KEY_2025}
       APP_JWT_EXPIRATION: ${APP_JWT_EXPIRATION:-3600000}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-flash-latest}
+      GEMINI_MAX_TOKENS: ${GEMINI_MAX_TOKENS:-1024}
     depends_on:
       mysql:
         condition: service_healthy

@@ -9,11 +9,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.Duration;
+import java.time.Instant;
 import java.time.temporal.WeekFields;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,6 +25,9 @@ public class StatsService {
 
 	private final StudySessionRepository studySessionRepository;
 	private final ProductivityAnalyzer productivityAnalyzer;
+
+	private static final Duration AI_REPORT_TTL = Duration.ofMinutes(2);
+	private final Map<Long, CachedReport> aiReportCache = new ConcurrentHashMap<>();
 
 	public Map<String, Integer> getDailyTotals(User user, int days) {
 		LocalDate end = LocalDate.now();
@@ -63,8 +69,26 @@ public class StatsService {
 	}
 
 	public ProductivityReport buildAiReport(User user) {
+		if (user == null || user.getId() == null) {
+			List<StudySession> sessions = studySessionRepository.findByUser(user);
+			return productivityAnalyzer.analyze(sessions);
+		}
+
+		long userId = user.getId();
+		Instant now = Instant.now();
+
+		CachedReport cached = aiReportCache.get(userId);
+		if (cached != null && cached.expiresAt.isAfter(now)) {
+			return cached.report;
+		}
+
 		List<StudySession> sessions = studySessionRepository.findByUser(user);
-		return productivityAnalyzer.analyze(sessions);
+		ProductivityReport report = productivityAnalyzer.analyze(sessions);
+		aiReportCache.put(userId, new CachedReport(report, now.plus(AI_REPORT_TTL)));
+		return report;
+	}
+
+	private record CachedReport(ProductivityReport report, Instant expiresAt) {
 	}
 }
 

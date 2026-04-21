@@ -34,6 +34,13 @@
 		<jacoco.version>0.8.11</jacoco.version>
 		<sonar-maven-plugin.version>3.10.0.2594</sonar-maven-plugin.version>
 		<spotbugs-maven-plugin.version>4.8.3.6</spotbugs-maven-plugin.version>
+		<!--
+			Frontend build is intentionally optional:
+			- On Windows, we use npm.cmd (works in local dev).
+			- In Docker (Linux), we typically skip frontend to keep the image lean.
+		-->
+		<frontend.skip>false</frontend.skip>
+		<npm.executable>npm</npm.executable>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -42,11 +49,19 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-core</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.mysql</groupId>
@@ -218,8 +233,9 @@
 							<goal>exec</goal>
 						</goals>
 						<configuration>
-							<workingDirectory>${project.basedir}/frontend</workingDirectory>
-							<executable>npm.cmd</executable>
+							<skip>${frontend.skip}</skip>
+							<workingDirectory>${project.basedir}/../frontend</workingDirectory>
+							<executable>${npm.executable}</executable>
 							<arguments>
 								<argument>install</argument>
 							</arguments>
@@ -232,8 +248,9 @@
 							<goal>exec</goal>
 						</goals>
 						<configuration>
-							<workingDirectory>${project.basedir}/frontend</workingDirectory>
-							<executable>npm.cmd</executable>
+							<skip>${frontend.skip}</skip>
+							<workingDirectory>${project.basedir}/../frontend</workingDirectory>
+							<executable>${npm.executable}</executable>
 							<arguments>
 								<argument>run</argument>
 								<argument>build</argument>
@@ -253,10 +270,11 @@
 							<goal>copy-resources</goal>
 						</goals>
 						<configuration>
+							<skip>${frontend.skip}</skip>
 							<outputDirectory>${project.build.outputDirectory}/static</outputDirectory>
 							<resources>
 								<resource>
-									<directory>${project.basedir}/frontend/dist/frontend/browser</directory>
+									<directory>${project.basedir}/../frontend/dist/frontend/browser</directory>
 									<filtering>false</filtering>
 								</resource>
 							</resources>
@@ -266,5 +284,19 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>windows</id>
+			<activation>
+				<os>
+					<family>Windows</family>
+				</os>
+			</activation>
+			<properties>
+				<npm.executable>npm.cmd</npm.executable>
+			</properties>
+		</profile>
+	</profiles>
 
 </project>

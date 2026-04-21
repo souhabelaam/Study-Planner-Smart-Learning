@@ -15,7 +15,25 @@
       </div>
       <div>
         <label>Password</label>
-        <input class="form-control" type="password" formControlName="password" />
+        <div class="password-input-wrapper">
+          <input class="form-control" [type]="showPassword ? 'text' : 'password'" formControlName="password" />
+          <button type="button" class="password-toggle" (click)="togglePasswordVisibility()" tabindex="-1" [title]="showPassword ? 'Hide password' : 'Show password'">
+            <span *ngIf="!showPassword" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            </span>
+            <span *ngIf="showPassword" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 3l18 18"></path>
+                <path d="M10.58 10.58A3 3 0 0 0 12 15a3 3 0 0 0 1.42-.35"></path>
+                <path d="M9.88 5.14A11.2 11.2 0 0 1 12 5c7 0 10.5 7 10.5 7a19.5 19.5 0 0 1-4.03 5.06"></path>
+                <path d="M6.23 6.23C3.67 7.85 1.5 12 1.5 12s3.5 7 10.5 7c1.45 0 2.8-.2 4.03-.58"></path>
+              </svg>
+            </span>
+          </button>
+        </div>
       </div>
       <button class="btn-primary" type="submit" [disabled]="loading">Sign in</button>
     </form>
