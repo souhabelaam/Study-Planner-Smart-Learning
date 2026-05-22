@@ -22,7 +22,9 @@ export interface Subject {
 
 export interface StudySession {
   id: number;
-  subject: Subject | null;
+  subjectId?: number;
+  subjectName?: string;
+  subject?: Subject | null;
   durationMinutes: number;
   date: string;
   startHour: number | null;
@@ -35,6 +37,16 @@ export interface StudySessionDto {
   date: string;
   startHour: number;
   startMinute: number;
+}
+
+export interface DashboardOverview {
+  subjectCount: number;
+  sessionCount: number;
+  productivityScore: number;
+  consistencyScore: number;
+  mostActiveHour: number;
+  suggestions: string[];
+  dailyStats: Record<string, number>;
 }
 
 export interface ProductivityReport {

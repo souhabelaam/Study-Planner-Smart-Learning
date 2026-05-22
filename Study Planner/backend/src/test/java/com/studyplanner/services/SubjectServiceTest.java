@@ -2,6 +2,7 @@ package com.studyplanner.services;
 
 import com.studyplanner.models.Subject;
 import com.studyplanner.models.User;
+import com.studyplanner.repositories.StudySessionRepository;
 import com.studyplanner.repositories.SubjectRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,6 +26,12 @@ class SubjectServiceTest {
 
 	@Mock
 	private SubjectRepository subjectRepository;
+
+	@Mock
+	private StatsService statsService;
+
+	@Mock
+	private StudySessionRepository studySessionRepository;
 
 	@InjectMocks
 	private SubjectService subjectService;
@@ -169,12 +176,15 @@ class SubjectServiceTest {
 				.build();
 
 		when(subjectRepository.findById(subjectId)).thenReturn(Optional.of(subject));
+		when(studySessionRepository.findBySubject(subject)).thenReturn(Collections.emptyList());
 		doNothing().when(subjectRepository).delete(subject);
 
 		// When
 		subjectService.deleteSubject(testUser, subjectId);
 
 		// Then
+		verify(studySessionRepository).findBySubject(subject);
 		verify(subjectRepository).delete(subject);
+		verify(statsService).invalidateAiReportCache(testUser.getId());
 	}
 }

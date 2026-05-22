@@ -13,6 +13,7 @@ import java.time.LocalDate;
 @Setter
 public class StudySessionDTO {
 
+	@NotNull
 	private Long subjectId;
 
 	@Min(1)

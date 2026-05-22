@@ -1,16 +1,28 @@
-import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild, inject } from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+  inject
+} from '@angular/core';
+import { NavigationEnd, Router } from '@angular/router';
+import { filter, skip } from 'rxjs/operators';
 import { ApiService } from '../core/api.service';
 import { Chart } from 'chart.js/auto';
 import { ProductivityReport } from '../core/models';
-import { forkJoin } from 'rxjs';
 
 @Component({
   standalone: true,
   selector: 'app-dashboard-page',
   templateUrl: './dashboard-page.component.html'
 })
-export class DashboardPageComponent implements AfterViewInit, OnDestroy {
+export class DashboardPageComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly api = inject(ApiService);
+  private readonly router = inject(Router);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   @ViewChild('dailyCanvas') dailyCanvas?: ElementRef<HTMLCanvasElement>;
 
@@ -18,29 +30,52 @@ export class DashboardPageComponent implements AfterViewInit, OnDestroy {
   sessionCount = 0;
   score = 0;
   report: ProductivityReport | null = null;
+  loading = true;
   private dailyChart?: Chart;
+  private pendingDaily: Record<string, number> | null = null;
 
-  constructor() {
-    forkJoin({
-      subjects: this.api.getSubjects(),
-      sessions: this.api.getSessions(),
-      report: this.api.getAiReport(),
-      daily: this.api.getDailyStats()
-    }).subscribe(({ subjects, sessions, report, daily }) => {
-      this.subjectCount = subjects.length;
-      this.sessionCount = sessions.length;
-      this.score = report.productivityScore;
-      this.report = report;
-      this.renderDailyChart(daily);
-    });
+  ngOnInit(): void {
+    this.loadDashboard();
+    this.router.events
+      .pipe(
+        filter((event) => event instanceof NavigationEnd),
+        skip(1)
+      )
+      .subscribe(() => this.loadDashboard());
   }
 
   ngAfterViewInit(): void {
-    // Chart rendering happens after API data arrives and canvas is available.
+    if (this.pendingDaily) {
+      this.renderDailyChart(this.pendingDaily);
+    }
   }
 
   ngOnDestroy(): void {
     this.dailyChart?.destroy();
+  }
+
+  private loadDashboard(): void {
+    this.loading = true;
+    this.api.getDashboardOverview().subscribe((overview) => {
+      this.loading = false;
+      if (!overview) {
+        this.cdr.detectChanges();
+        return;
+      }
+
+      this.subjectCount = overview.subjectCount;
+      this.sessionCount = overview.sessionCount;
+      this.score = Math.round(overview.productivityScore * 10) / 10;
+      this.report = {
+        mostActiveHour: overview.mostActiveHour,
+        consistencyScore: overview.consistencyScore,
+        productivityScore: overview.productivityScore,
+        suggestions: overview.suggestions ?? []
+      };
+      this.pendingDaily = overview.dailyStats ?? {};
+      this.renderDailyChart(this.pendingDaily);
+      this.cdr.detectChanges();
+    });
   }
 
   private renderDailyChart(daily: Record<string, number>): void {

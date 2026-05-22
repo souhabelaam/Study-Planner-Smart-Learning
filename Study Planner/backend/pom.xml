@@ -287,6 +287,12 @@
 
 	<profiles>
 		<profile>
+			<id>dev</id>
+			<properties>
+				<frontend.skip>true</frontend.skip>
+			</properties>
+		</profile>
+		<profile>
 			<id>windows</id>
 			<activation>
 				<os>

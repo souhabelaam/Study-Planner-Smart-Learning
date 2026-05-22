@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/subjects")
@@ -31,6 +32,16 @@ public class SubjectRestController {
 	@PostMapping
 	public Subject createSubject(@Valid @RequestBody Subject subject) {
 		return subjectService.saveSubject(userService.getCurrentUser(), subject);
+	}
+
+	@PostMapping("/bulk")
+	public List<Subject> bulkCreateSubjects(@RequestBody List<String> names) {
+		List<String> cleaned = names == null ? List.of() : names.stream()
+				.filter(Objects::nonNull)
+				.map(String::trim)
+				.filter(name -> !name.isEmpty())
+				.toList();
+		return subjectService.saveSubjects(userService.getCurrentUser(), cleaned);
 	}
 
 	@DeleteMapping("/{id}")

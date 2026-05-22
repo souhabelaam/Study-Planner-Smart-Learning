@@ -5,7 +5,7 @@
     <form class="form-shell" (ngSubmit)="create()">
       <select class="form-select" [(ngModel)]="subjectId" name="subjectId" required>
         @for (subject of subjects; track subject.id) {
-        <option [value]="subject.id">{{ subject.name }}</option>
+        <option [ngValue]="subject.id">{{ subject.name }}</option>
         }
       </select>
       <input class="form-control" type="number" min="1" [(ngModel)]="durationMinutes" name="durationMinutes" placeholder="Duration (minutes)" />
@@ -14,7 +14,7 @@
         <input class="form-control" type="number" min="0" max="23" [(ngModel)]="startHour" name="startHour" placeholder="Hour" />
         <input class="form-control" type="number" min="0" max="59" [(ngModel)]="startMinute" name="startMinute" placeholder="Minute" />
       </div>
-      <button class="btn-primary" type="submit">Add session</button>
+      <button class="btn-primary" type="submit" [disabled]="saving || !subjectId">{{ saving ? 'Saving...' : 'Add session' }}</button>
     </form>
   </div>
 
@@ -29,7 +29,7 @@
       <tbody>
         @for (session of sessions; track session.id) {
         <tr>
-          <td>{{ session.subject?.name ?? 'N/A' }}</td>
+          <td>{{ sessionSubjectName(session) }}</td>
           <td>{{ session.date }}</td>
           <td>{{ session.durationMinutes }} min</td>
           <td>{{ session.startHour ?? '-' }}:{{ session.startMinute ?? '-' }}</td>
@@ -57,7 +57,7 @@
         <div class="timeline-bullet"></div>
         <div class="timeline-card">
           <div class="d-flex align-center space-between">
-            <strong>{{ session.subject?.name ?? 'Matiere supprimee' }}</strong>
+            <strong>{{ sessionSubjectName(session) }}</strong>
             <span class="tag">{{ session.durationMinutes }} min</span>
           </div>
           <p class="text-muted mb-0">

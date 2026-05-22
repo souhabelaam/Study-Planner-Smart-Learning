@@ -5,8 +5,10 @@ import com.studyplanner.models.StudySession;
 import com.studyplanner.models.Subject;
 import com.studyplanner.models.User;
 import com.studyplanner.repositories.StudySessionRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.Comparator;
@@ -17,9 +19,11 @@ import java.util.List;
 public class StudySessionService {
 
 	private final StudySessionRepository studySessionRepository;
+	private final StatsService statsService;
 
+	@Transactional(readOnly = true)
 	public List<StudySession> findForUser(User user) {
-		return studySessionRepository.findByUser(user)
+		return studySessionRepository.findByUserWithSubject(user)
 				.stream()
 				.sorted(Comparator.comparing(StudySession::getDate).reversed())
 				.toList();
@@ -34,17 +38,20 @@ public class StudySessionService {
 				.startHour(dto.getStartHour())
 				.startMinute(dto.getStartMinute())
 				.build();
-		return studySessionRepository.save(session);
+		StudySession saved = studySessionRepository.save(session);
+		statsService.invalidateAiReportCache(user.getId());
+		return saved;
 	}
 
+	@Transactional(readOnly = true)
 	public StudySession getOwnedSession(User user, Long id) {
-		return studySessionRepository.findById(id)
-				.filter(s -> s.getUser().getId().equals(user.getId()))
-				.orElseThrow(() -> new IllegalArgumentException("Session introuvable"));
+		return studySessionRepository.findByIdAndUserId(id, user.getId())
+				.orElseThrow(() -> new EntityNotFoundException("Session introuvable"));
 	}
 
 	public void deleteSession(User user, Long id) {
 		studySessionRepository.delete(getOwnedSession(user, id));
+		statsService.invalidateAiReportCache(user.getId());
 	}
 
 	public List<StudySession> findBetween(User user, LocalDate start, LocalDate end) {

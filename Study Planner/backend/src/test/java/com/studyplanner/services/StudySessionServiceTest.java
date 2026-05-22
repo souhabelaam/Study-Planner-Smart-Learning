@@ -5,6 +5,7 @@ import com.studyplanner.models.StudySession;
 import com.studyplanner.models.Subject;
 import com.studyplanner.models.User;
 import com.studyplanner.repositories.StudySessionRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,6 +29,9 @@ class StudySessionServiceTest {
 
 	@Mock
 	private StudySessionRepository studySessionRepository;
+
+	@Mock
+	private StatsService statsService;
 
 	@InjectMocks
 	private StudySessionService studySessionService;
@@ -109,7 +113,7 @@ class StudySessionServiceTest {
 				.date(date3)
 				.build();
 
-		when(studySessionRepository.findByUser(testUser))
+		when(studySessionRepository.findByUserWithSubject(testUser))
 				.thenReturn(Arrays.asList(session1, session2, session3));
 
 		// When
@@ -132,7 +136,7 @@ class StudySessionServiceTest {
 				.subject(testSubject)
 				.build();
 
-		when(studySessionRepository.findById(sessionId)).thenReturn(Optional.of(session));
+		when(studySessionRepository.findByIdAndUserId(sessionId, testUser.getId())).thenReturn(Optional.of(session));
 
 		// When
 		StudySession result = studySessionService.getOwnedSession(testUser, sessionId);
@@ -146,11 +150,11 @@ class StudySessionServiceTest {
 	void getOwnedSession_WithInvalidId_ShouldThrowException() {
 		// Given
 		Long sessionId = 999L;
-		when(studySessionRepository.findById(sessionId)).thenReturn(Optional.empty());
+		when(studySessionRepository.findByIdAndUserId(sessionId, testUser.getId())).thenReturn(Optional.empty());
 
 		// When/Then
 		assertThatThrownBy(() -> studySessionService.getOwnedSession(testUser, sessionId))
-				.isInstanceOf(IllegalArgumentException.class)
+				.isInstanceOf(EntityNotFoundException.class)
 				.hasMessageContaining("Session introuvable");
 	}
 
@@ -158,18 +162,11 @@ class StudySessionServiceTest {
 	void getOwnedSession_WithDifferentUser_ShouldThrowException() {
 		// Given
 		Long sessionId = 1L;
-		User otherUser = User.builder().id(2L).build();
-		StudySession session = StudySession.builder()
-				.id(sessionId)
-				.user(otherUser)
-				.subject(testSubject)
-				.build();
-
-		when(studySessionRepository.findById(sessionId)).thenReturn(Optional.of(session));
+		when(studySessionRepository.findByIdAndUserId(sessionId, testUser.getId())).thenReturn(Optional.empty());
 
 		// When/Then
 		assertThatThrownBy(() -> studySessionService.getOwnedSession(testUser, sessionId))
-				.isInstanceOf(IllegalArgumentException.class)
+				.isInstanceOf(EntityNotFoundException.class)
 				.hasMessageContaining("Session introuvable");
 	}
 
@@ -183,7 +180,7 @@ class StudySessionServiceTest {
 				.subject(testSubject)
 				.build();
 
-		when(studySessionRepository.findById(sessionId)).thenReturn(Optional.of(session));
+		when(studySessionRepository.findByIdAndUserId(sessionId, testUser.getId())).thenReturn(Optional.of(session));
 		doNothing().when(studySessionRepository).delete(session);
 
 		// When

@@ -2,6 +2,7 @@ package com.studyplanner.services;
 
 import com.studyplanner.models.Subject;
 import com.studyplanner.models.User;
+import com.studyplanner.repositories.StudySessionRepository;
 import com.studyplanner.repositories.SubjectRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,8 @@ import java.util.Set;
 public class SubjectService {
 
 	private final SubjectRepository subjectRepository;
+	private final StatsService statsService;
+	private final StudySessionRepository studySessionRepository;
 
 	public List<Subject> findForUser(User user) {
 		return subjectRepository.findByUser(user);
@@ -24,7 +27,9 @@ public class SubjectService {
 
 	public Subject saveSubject(User user, Subject subject) {
 		subject.setUser(user);
-		return subjectRepository.save(subject);
+		Subject saved = subjectRepository.save(subject);
+		statsService.invalidateAiReportCache(user.getId());
+		return saved;
 	}
 
 	public List<Subject> saveSubjects(User user, List<String> names) {
@@ -48,6 +53,7 @@ public class SubjectService {
 			saved.add(subjectRepository.save(subject));
 			existing.add(cleaned);
 		}
+		statsService.invalidateAiReportCache(user.getId());
 		return saved;
 	}
 
@@ -63,7 +69,9 @@ public class SubjectService {
 
 	public void deleteSubject(User user, Long id) {
 		Subject subject = getOwnedSubject(user, id);
+		studySessionRepository.findBySubject(subject).forEach(studySessionRepository::delete);
 		subjectRepository.delete(subject);
+		statsService.invalidateAiReportCache(user.getId());
 	}
 }
 

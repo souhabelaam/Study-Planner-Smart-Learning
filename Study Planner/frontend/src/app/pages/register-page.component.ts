@@ -1,5 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../core/auth.service';
@@ -37,8 +38,14 @@ export class RegisterPageComponent {
     this.loading = true;
     this.authService.register(this.form.getRawValue() as { username: string; email: string; password: string }).subscribe({
       next: () => this.router.navigate(['/login']),
-      error: () => {
-        this.error = "Registration failed. Please try another username/email.";
+      error: (err: HttpErrorResponse) => {
+        const backendMessage =
+          typeof err.error === 'string'
+            ? err.error
+            : err.error && typeof err.error.message === 'string'
+              ? err.error.message
+              : '';
+        this.error = backendMessage || 'Registration failed. Please try another username/email.';
         this.loading = false;
       }
     });

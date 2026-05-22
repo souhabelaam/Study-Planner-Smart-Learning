@@ -1,5 +1,6 @@
 package com.studyplanner.rest;
 
+import com.studyplanner.dto.DashboardOverviewDto;
 import com.studyplanner.dto.ProductivityReport;
 import com.studyplanner.services.StatsService;
 import com.studyplanner.services.UserService;
@@ -17,6 +18,11 @@ public class StatsRestController {
 
 	private final StatsService statsService;
 	private final UserService userService;
+
+	@GetMapping("/overview")
+	public DashboardOverviewDto overview() {
+		return statsService.getDashboardOverview(userService.getCurrentUser());
+	}
 
 	@GetMapping("/daily")
 	public Map<String, Integer> daily() {

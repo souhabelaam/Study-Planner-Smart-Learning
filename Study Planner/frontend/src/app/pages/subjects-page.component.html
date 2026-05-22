@@ -10,7 +10,7 @@
   <div class="app-card mb-4">
     <div class="d-flex gap-2 align-end">
       <input class="form-control" [(ngModel)]="newName" placeholder="Subject name" />
-      <button class="btn-primary" type="button" (click)="create()">Add</button>
+      <button class="btn-primary" type="button" (click)="create()" [disabled]="saving">{{ saving ? 'Saving...' : 'Add' }}</button>
     </div>
   </div>
   <div class="app-card mb-4">
@@ -18,7 +18,7 @@
     <p class="text-muted">Paste a list. Duplicates will be ignored.</p>
     <div class="form-shell">
       <textarea class="form-control" [(ngModel)]="bulkNames" placeholder="Example: Math, Physics&#10;or one per line"></textarea>
-      <button class="btn-primary w-fit" type="button" (click)="quickAdd()">Add list</button>
+      <button class="btn-primary w-fit" type="button" (click)="quickAdd()" [disabled]="saving">{{ saving ? 'Saving...' : 'Add list' }}</button>
     </div>
   </div>
   <div class="app-card">

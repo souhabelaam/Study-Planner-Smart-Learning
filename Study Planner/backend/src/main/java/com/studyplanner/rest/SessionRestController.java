@@ -1,7 +1,7 @@
 package com.studyplanner.rest;
 
 import com.studyplanner.dto.StudySessionDTO;
-import com.studyplanner.models.StudySession;
+import com.studyplanner.dto.StudySessionResponse;
 import com.studyplanner.services.StudySessionService;
 import com.studyplanner.services.SubjectService;
 import com.studyplanner.services.UserService;
@@ -27,20 +27,23 @@ public class SessionRestController {
 	private final UserService userService;
 
 	@GetMapping
-	public List<StudySession> listSessions() {
-		return studySessionService.findForUser(userService.getCurrentUser());
+	public List<StudySessionResponse> listSessions() {
+		return studySessionService.findForUser(userService.getCurrentUser()).stream()
+				.map(StudySessionResponse::from)
+				.toList();
 	}
 
 	@GetMapping("/{id}")
-	public StudySession getSession(@PathVariable Long id) {
-		return studySessionService.getOwnedSession(userService.getCurrentUser(), id);
+	public StudySessionResponse getSession(@PathVariable Long id) {
+		return StudySessionResponse.from(
+				studySessionService.getOwnedSession(userService.getCurrentUser(), id));
 	}
 
 	@PostMapping
-	public StudySession createSession(@Valid @RequestBody StudySessionDTO dto) {
+	public StudySessionResponse createSession(@Valid @RequestBody StudySessionDTO dto) {
 		var user = userService.getCurrentUser();
 		var subject = subjectService.getOwnedSubject(user, dto.getSubjectId());
-		return studySessionService.saveSession(user, subject, dto);
+		return StudySessionResponse.from(studySessionService.saveSession(user, subject, dto));
 	}
 
 	@DeleteMapping("/{id}")

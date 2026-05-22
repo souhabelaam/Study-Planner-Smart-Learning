@@ -2,7 +2,7 @@ import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild, inject } fr
 import { ApiService } from '../core/api.service';
 import { ProductivityReport } from '../core/models';
 import { Chart } from 'chart.js/auto';
-import { forkJoin } from 'rxjs';
+import { catchError, forkJoin, of } from 'rxjs';
 
 @Component({
   standalone: true,
@@ -25,7 +25,7 @@ export class StatsPageComponent implements AfterViewInit, OnDestroy {
     forkJoin({
       daily: this.api.getDailyStats(),
       weekly: this.api.getWeeklyStats(),
-      report: this.api.getAiReport()
+      report: this.api.getAiReport().pipe(catchError(() => of(null)))
     }).subscribe(({ daily, weekly, report }) => {
       this.daily = daily;
       this.weekly = weekly;

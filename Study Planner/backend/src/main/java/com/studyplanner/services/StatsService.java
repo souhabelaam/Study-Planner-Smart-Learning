@@ -1,6 +1,8 @@
 package com.studyplanner.services;
 
+import com.studyplanner.dto.DashboardOverviewDto;
 import com.studyplanner.dto.ProductivityReport;
+import com.studyplanner.repositories.SubjectRepository;
 import com.studyplanner.models.StudySession;
 import com.studyplanner.models.User;
 import com.studyplanner.repositories.StudySessionRepository;
@@ -24,6 +26,7 @@ import java.util.stream.Collectors;
 public class StatsService {
 
 	private final StudySessionRepository studySessionRepository;
+	private final SubjectRepository subjectRepository;
 	private final ProductivityAnalyzer productivityAnalyzer;
 
 	private static final Duration AI_REPORT_TTL = Duration.ofMinutes(2);
@@ -66,6 +69,25 @@ public class StatsService {
 						(a, b) -> a,
 						LinkedHashMap::new
 				));
+	}
+
+	public void invalidateAiReportCache(Long userId) {
+		if (userId != null) {
+			aiReportCache.remove(userId);
+		}
+	}
+
+	public DashboardOverviewDto getDashboardOverview(User user) {
+		ProductivityReport report = buildAiReport(user);
+		return DashboardOverviewDto.builder()
+				.subjectCount(subjectRepository.countByUser(user))
+				.sessionCount(studySessionRepository.countByUser(user))
+				.productivityScore(report.getProductivityScore())
+				.consistencyScore(report.getConsistencyScore())
+				.mostActiveHour(report.getMostActiveHour())
+				.suggestions(report.getSuggestions())
+				.dailyStats(getDailyTotals(user, 7))
+				.build();
 	}
 
 	public ProductivityReport buildAiReport(User user) {

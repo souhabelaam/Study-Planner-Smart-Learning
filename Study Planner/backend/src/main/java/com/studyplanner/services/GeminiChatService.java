@@ -30,7 +30,7 @@ public class GeminiChatService {
 	@Value("${app.gemini.model:gemini-flash-latest}")
 	private String model;
 
-	@Value("${app.gemini.maxTokens:1024}")
+	@Value("${app.gemini.maxTokens:2048}")
 	private int maxTokens;
 
 	public GeminiChatService() {
@@ -53,11 +53,7 @@ public class GeminiChatService {
 			return new ChatResponse("__GEMINI_FALLBACK__");
 		}
 
-		String systemText =
-				"You are a helpful study coach chatbot inside a Study Planner web app. " +
-				"Be concise, practical, and friendly. If the question is general (e.g. definitions), answer clearly. " +
-				"If the question is about studying, provide actionable steps.\n\n" +
-				"User context:\n" + (context == null ? "" : context);
+		String systemText = buildSystemPrompt(userMessage, context);
 
 		List<Map<String, Object>> contents = new ArrayList<>();
 		if (history != null && !history.isEmpty()) {
@@ -127,27 +123,61 @@ public class GeminiChatService {
 		if (response == null || response.candidates == null || response.candidates.isEmpty()) return null;
 		var cand = response.candidates.get(0);
 		if (cand == null || cand.content == null || cand.content.parts == null) return null;
-		return cand.content.parts.stream()
+		String joined = cand.content.parts.stream()
 				.map(p -> p == null ? null : p.text)
 				.filter(t -> t != null && !t.isBlank())
-				.findFirst()
+				.reduce((a, b) -> a + b)
 				.orElse(null);
+		if (joined == null) return null;
+		if ("MAX_TOKENS".equalsIgnoreCase(cand.finishReason)) {
+			joined = joined.trim() + "\n\n_(Response shortened — ask me to continue if you want more detail.)_";
+		}
+		return joined;
+	}
+
+	private String buildSystemPrompt(String userMessage, String context) {
+		boolean wantsDetail = wantsDetailedAnswer(userMessage);
+		String lengthHint = wantsDetail
+				? "The user asked for a detailed or longer explanation. Give a complete, well-structured answer (multiple short paragraphs if needed). Do not stop mid-sentence."
+				: "Be clear and practical. Use a few sentences unless the user asks for more detail.";
+		return "You are a helpful study coach chatbot inside a Study Planner web app. "
+				+ lengthHint + " "
+				+ "If the question is general (e.g. definitions), explain it clearly. "
+				+ "If it is about studying, include actionable steps.\n\n"
+				+ "User context:\n" + (context == null ? "" : context);
+	}
+
+	private boolean wantsDetailedAnswer(String userMessage) {
+		if (userMessage == null || userMessage.isBlank()) return false;
+		String m = userMessage.toLowerCase();
+		return m.contains("long")
+				|| m.contains("detail")
+				|| m.contains("explain more")
+				|| m.contains("more detail")
+				|| m.contains("elaborate")
+				|| m.contains("in depth")
+				|| m.contains("deeper")
+				|| m.matches(".*\\bmore\\b.*")
+				|| m.contains("full explanation")
+				|| m.contains("tell me more");
 	}
 
 	private int pickOutputTokens(String userMessage) {
-		// Shorter outputs are noticeably faster for typical UI chat queries.
-		// Keep a sensible upper bound from config.
-		int configured = Math.max(64, maxTokens);
+		int configured = Math.max(512, maxTokens);
+		if (wantsDetailedAnswer(userMessage)) {
+			return configured;
+		}
 		int len = userMessage == null ? 0 : userMessage.trim().length();
-		if (len <= 80) return Math.min(configured, 256);
-		if (len <= 200) return Math.min(configured, 512);
-		return configured;
+		if (len <= 40) {
+			return Math.min(configured, 768);
+		}
+		return Math.min(configured, 1024);
 	}
 
 	@JsonIgnoreProperties(ignoreUnknown = true)
 	public record GeminiGenerateContentResponse(List<Candidate> candidates) {
 		@JsonIgnoreProperties(ignoreUnknown = true)
-		public record Candidate(Content content) {
+		public record Candidate(Content content, String finishReason) {
 		}
 
 		@JsonIgnoreProperties(ignoreUnknown = true)
