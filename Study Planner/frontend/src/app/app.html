@@ -1,50 +1,77 @@
 <header class="app-navbar">
-  <div class="brand">
-    <span class="brand-pill">Smart Learning</span>
-    <span class="brand-text">Study Planner</span>
-  </div>
-  <nav class="nav-links">
+  <a routerLink="/" class="brand brand-link" aria-label="Study Planner — Accueil">
+    <span class="brand-mark" aria-hidden="true">SP</span>
+    <span class="brand-copy">
+      <span class="brand-text">Study Planner</span>
+      <span class="brand-pill">{{ authService.isAdmin() ? 'Admin' : authService.isLoggedIn() ? 'Étudiant' : 'Smart Learning' }}</span>
+    </span>
+  </a>
+
+  <nav class="nav-links" aria-label="Navigation principale">
     @if (authService.isLoggedIn()) {
-      <a routerLink="/dashboard" routerLinkActive="is-active" class="nav-link-item">Dashboard</a>
-      <a routerLink="/subjects" routerLinkActive="is-active" class="nav-link-item">Subjects</a>
-      <a routerLink="/sessions" routerLinkActive="is-active" class="nav-link-item">Sessions</a>
-      <a routerLink="/stats" routerLinkActive="is-active" class="nav-link-item">Analytics</a>
-      <button class="icon-btn" type="button" (click)="toggleTheme()" [attr.aria-label]="themeService.getTheme() === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'">
-        @if (themeService.getTheme() === 'dark') {
-          <span class="icon" aria-hidden="true">☀</span>
-        } @else {
-          <span class="icon" aria-hidden="true">☾</span>
+      @if (authService.isAdmin()) {
+        <div class="nav-group nav-group--primary">
+          <a routerLink="/admin" routerLinkActive="is-active" class="nav-link-item">Console admin</a>
+        </div>
+      } @else {
+        <div class="nav-group nav-group--primary">
+          <a routerLink="/dashboard" routerLinkActive="is-active" class="nav-link-item">Dashboard</a>
+          <a routerLink="/lab" routerLinkActive="is-active" class="nav-link-item nav-link-item--accent">Smart Lab</a>
+          <a routerLink="/notes" routerLinkActive="is-active" class="nav-link-item">Notes</a>
+          <a routerLink="/game" routerLinkActive="is-active" class="nav-link-item">Mini-jeu</a>
+          <a routerLink="/subjects" routerLinkActive="is-active" class="nav-link-item">Matières</a>
+          <a routerLink="/sessions" routerLinkActive="is-active" class="nav-link-item">Sessions</a>
+          <a routerLink="/stats" routerLinkActive="is-active" class="nav-link-item">Analytics</a>
+        </div>
+      }
+      <div class="nav-group nav-group--actions">
+        <span class="nav-user text-muted">{{ authService.getUsername() }}</span>
+        <button class="icon-btn" type="button" (click)="toggleTheme()" [attr.aria-label]="themeService.getTheme() === 'dark' ? 'Mode clair' : 'Mode sombre'">
+          @if (themeService.getTheme() === 'dark') {
+            <span class="icon" aria-hidden="true">☀</span>
+          } @else {
+            <span class="icon" aria-hidden="true">☾</span>
+          }
+        </button>
+        @if (authService.isStudent()) {
+          <button class="icon-btn chat-btn" type="button" (click)="toggleChat()" aria-label="Assistant IA">
+            <span class="badge" *ngIf="chatUnread > 0">{{ chatUnread }}</span>
+            <svg class="svg-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path fill="currentColor" d="M20 2H4a2 2 0 0 0-2 2v18l4-4h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2Zm0 14H5.17L4 17.17V4h16v12Z"/>
+            </svg>
+          </button>
         }
-      </button>
-      <button class="icon-btn chat-btn" type="button" (click)="toggleChat()" aria-label="Open IA Helper chat">
-        <span class="badge" *ngIf="chatUnread > 0">{{ chatUnread }}</span>
-        <svg class="svg-icon" viewBox="0 0 24 24" aria-hidden="true">
-          <path
-            fill="currentColor"
-            d="M20 2H4a2 2 0 0 0-2 2v18l4-4h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2Zm0 14H5.17L4 17.17V4h16v12Z"
-          />
-        </svg>
-      </button>
-      <button class="btn-ghost" type="button" (click)="logout()">Logout</button>
+        <button class="btn-ghost btn-ghost--sm" type="button" (click)="logout()">Déconnexion</button>
+      </div>
     } @else {
-      <a routerLink="/login" routerLinkActive="is-active" class="nav-link-item">Login</a>
-      <a routerLink="/register" routerLinkActive="is-active" class="nav-link-item">Register</a>
-      <button class="icon-btn" type="button" (click)="toggleTheme()" [attr.aria-label]="themeService.getTheme() === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'">
-        @if (themeService.getTheme() === 'dark') {
-          <span class="icon" aria-hidden="true">☀</span>
-        } @else {
-          <span class="icon" aria-hidden="true">☾</span>
-        }
-      </button>
+      <div class="nav-group nav-group--primary">
+        <a routerLink="/" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link-item">Accueil</a>
+      </div>
+      <div class="nav-group nav-group--actions">
+        <button class="icon-btn" type="button" (click)="toggleTheme()" [attr.aria-label]="themeService.getTheme() === 'dark' ? 'Mode clair' : 'Mode sombre'">
+          @if (themeService.getTheme() === 'dark') { <span class="icon">☀</span> } @else { <span class="icon">☾</span> }
+        </button>
+        <a routerLink="/login" class="nav-link-item">Connexion</a>
+        <a routerLink="/register" class="btn-primary btn-primary--nav">S'inscrire</a>
+      </div>
     }
   </nav>
 </header>
 
-<main>
-  <router-outlet />
+<main class="app-main">
+  @if (authService.isStudent() && showStudentLayout) {
+    <div class="app-layout-student">
+      <div class="app-layout-student__main">
+        <router-outlet />
+      </div>
+      <app-ad-banner [ads]="studentAds()" />
+    </div>
+  } @else {
+    <router-outlet />
+  }
 </main>
 
-@if (authService.isLoggedIn()) {
+@if (authService.isStudent()) {
   <app-chat-widget
     [open]="chatOpen"
     (close)="chatOpen = false"

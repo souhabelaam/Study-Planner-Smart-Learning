@@ -1,45 +1,49 @@
 <div class="app-shell auth-shell">
-  <div class="auth-hero">
-    <h1 class="auth-title">Welcome back</h1>
-    <p class="auth-subtitle">Log in to manage your study sessions and AI analytics.</p>
-  </div>
-  <div class="app-card auth-card">
-    <h2 class="mb-0">Login</h2>
-    @if (error) {
-    <div class="alert alert-danger">{{ error }}</div>
-    }
-    <form class="form-shell" [formGroup]="form" (ngSubmit)="submit()">
-      <div>
-        <label>Username</label>
-        <input class="form-control" formControlName="username" />
-      </div>
-      <div>
-        <label>Password</label>
-        <div class="password-input-wrapper">
-          <input class="form-control" [type]="showPassword ? 'text' : 'password'" formControlName="password" />
-          <button type="button" class="password-toggle" (click)="togglePasswordVisibility()" tabindex="-1" [title]="showPassword ? 'Hide password' : 'Show password'">
-            <span *ngIf="!showPassword" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"></path>
-                <circle cx="12" cy="12" r="3"></circle>
-              </svg>
-            </span>
-            <span *ngIf="showPassword" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M3 3l18 18"></path>
-                <path d="M10.58 10.58A3 3 0 0 0 12 15a3 3 0 0 0 1.42-.35"></path>
-                <path d="M9.88 5.14A11.2 11.2 0 0 1 12 5c7 0 10.5 7 10.5 7a19.5 19.5 0 0 1-4.03 5.06"></path>
-                <path d="M6.23 6.23C3.67 7.85 1.5 12 1.5 12s3.5 7 10.5 7c1.45 0 2.8-.2 4.03-.58"></path>
-              </svg>
-            </span>
-          </button>
+  <div class="auth-layout">
+    <div class="auth-aside" aria-hidden="true">
+      <span class="section-label">Sécurité</span>
+      <h2 class="h2">Connexion claire,<br />accès immédiat</h2>
+      <p class="text-secondary">Un formulaire focalisé — une action principale par écran.</p>
+    </div>
+
+    <div class="auth-panel app-card">
+      <header class="auth-panel__head">
+        <h1 class="auth-title display-sm">Bon retour</h1>
+        <p class="auth-subtitle text-secondary">Connectez-vous pour gérer vos sessions et analytics.</p>
+      </header>
+
+      @if (error) {
+        <div class="alert alert-danger" role="alert">{{ error }}</div>
+      }
+
+      <form class="form-shell" [formGroup]="form" (ngSubmit)="submit()">
+        <div class="form-field">
+          <label for="username">Nom d'utilisateur</label>
+          <input id="username" class="form-control" formControlName="username" autocomplete="username" />
         </div>
-      </div>
-      <button class="btn-primary" type="submit" [disabled]="loading">Sign in</button>
-    </form>
-    <p class="mt-3">
-      No account yet?
-      <a class="cta-link" routerLink="/register">Create one</a>
-    </p>
+        <div class="form-field">
+          <label for="password">Mot de passe</label>
+          <div class="password-input-wrapper">
+            <input id="password" class="form-control" [type]="showPassword ? 'text' : 'password'" formControlName="password" autocomplete="current-password" />
+            <button type="button" class="password-toggle" (click)="togglePasswordVisibility()" tabindex="-1" [attr.aria-label]="showPassword ? 'Masquer' : 'Afficher'">
+              <span *ngIf="!showPassword" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+              </span>
+              <span *ngIf="showPassword" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3l18 18"/><path d="M10.58 10.58A3 3 0 0 0 12 15a3 3 0 0 0 1.42-.35"/></svg>
+              </span>
+            </button>
+          </div>
+        </div>
+        <button class="btn-primary btn-lg btn-block" type="submit" [disabled]="loading">
+          {{ loading ? 'Connexion…' : 'Se connecter' }}
+        </button>
+      </form>
+
+      <p class="auth-footer text-secondary">
+        Pas encore de compte ?
+        <a class="link-arrow" routerLink="/register">Créer un compte</a>
+      </p>
+    </div>
   </div>
 </div>

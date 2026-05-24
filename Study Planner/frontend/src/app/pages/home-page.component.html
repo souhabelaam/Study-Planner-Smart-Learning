@@ -1,0 +1,102 @@
+<!-- Z-pattern hero: message (1→3) puis CTA terminal (4) -->
+<section class="home-hero" aria-labelledby="home-title">
+  <div class="home-hero-grid">
+    <div class="home-hero-copy">
+      <span class="home-eyebrow">Plateforme d'études intelligente</span>
+      <h1 id="home-title" class="home-title display">
+        Apprenez avec <em>clarté</em>.<br />Progressez chaque jour.
+      </h1>
+      <p class="home-lead text-secondary">
+        Une interface pensée pour guider votre attention : tableau de bord, Smart Lab et coach IA —
+        sans surcharge cognitive.
+      </p>
+      <div class="home-cta-row">
+        @if (auth.isLoggedIn()) {
+          <a routerLink="/dashboard" class="btn-primary btn-lg">Tableau de bord</a>
+          <a routerLink="/lab" class="btn-secondary btn-lg">Smart Lab</a>
+        } @else {
+          <a routerLink="/register" class="btn-primary btn-lg">Commencer gratuitement</a>
+          <a routerLink="/login" class="btn-secondary btn-lg">Se connecter</a>
+        }
+      </div>
+      <ul class="home-trust" aria-label="Points forts">
+        <li><span class="trust-dot"></span> 6 outils innovants</li>
+        <li><span class="trust-dot"></span> Analytics IA</li>
+        <li><span class="trust-dot"></span> Mode sombre</li>
+      </ul>
+    </div>
+
+    <div class="home-hero-visual" aria-hidden="true">
+      <div class="home-visual-card home-visual-card--primary">
+        <p class="card-title">Série actuelle</p>
+        <p class="metric metric--hero">7</p>
+        <span class="text-muted">jours consécutifs</span>
+      </div>
+      <div class="home-visual-card home-visual-card--secondary">
+        <p class="card-title">Score productivité</p>
+        <p class="metric metric--sm">8.4<span>/10</span></p>
+      </div>
+      <div class="home-visual-card home-visual-card--accent">
+        <p class="card-title">Focus aujourd'hui</p>
+        <p class="metric metric--sm">45 <span>min</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="home-section section-spacing" aria-labelledby="features-title">
+  <header class="section-header">
+    <span class="section-label">Smart Lab</span>
+    <h2 id="features-title" class="h2">Six innovations, une seule interface</h2>
+    <p class="section-lead text-secondary">
+      Chaque outil est regroupé par proximité visuelle — vous savez où agir sans réfléchir.
+    </p>
+  </header>
+
+  <div class="home-features-grid grid-12">
+    @for (f of features; track f.tab) {
+      <article class="home-feature-card">
+        <span class="home-feature-icon" aria-hidden="true">{{ f.icon }}</span>
+        <h3 class="h3">{{ f.title }}</h3>
+        <p class="text-secondary">{{ f.desc }}</p>
+        @if (auth.isLoggedIn()) {
+          <a [routerLink]="['/lab']" [queryParams]="{ tab: f.tab }" class="link-arrow">Découvrir</a>
+        } @else {
+          <a routerLink="/register" class="link-arrow">S'inscrire pour accéder</a>
+        }
+      </article>
+    }
+  </div>
+</section>
+
+<section class="home-section section-spacing home-section--muted" aria-labelledby="why-title">
+  <div class="home-split grid-12">
+    <div class="home-split-copy">
+      <span class="section-label">Pourquoi nous</span>
+      <h2 id="why-title" class="h2">Équilibre visuel, parcours évident</h2>
+      <ul class="home-benefits">
+        <li>Hiérarchie claire : une action principale par section</li>
+        <li>Regroupement Gestalt — contenus liés, espaces distincts</li>
+        <li>Dashboard, matières et stats alignés sur une grille 12 colonnes</li>
+        <li>Assistant IA contextuel sur vos habitudes réelles</li>
+      </ul>
+    </div>
+    <aside class="home-preview-card app-card">
+      <p class="card-title">Aperçu session</p>
+      <div class="home-preview-metrics">
+        <div><span class="text-muted">Matières</span><strong>5</strong></div>
+        <div><span class="text-muted">Sessions</span><strong>24</strong></div>
+        <div><span class="text-muted">Constance</span><strong>7.2</strong></div>
+      </div>
+      <p class="text-quaternary">Données illustratives — connectez-vous pour vos chiffres.</p>
+    </aside>
+  </div>
+</section>
+
+<section class="home-cta-banner section-spacing" aria-labelledby="cta-title">
+  <h2 id="cta-title" class="h2">Prêt à structurer vos révisions ?</h2>
+  <p class="text-secondary">Un seul clic vers votre espace — le reste suit naturellement.</p>
+  <a [routerLink]="auth.isLoggedIn() ? '/lab' : '/register'" class="btn-primary btn-lg">
+    {{ auth.isLoggedIn() ? 'Ouvrir le Smart Lab' : 'Créer mon compte' }}
+  </a>
+</section>

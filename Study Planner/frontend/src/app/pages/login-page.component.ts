@@ -34,10 +34,15 @@ export class LoginPageComponent {
     }
     this.error = '';
     this.loading = true;
-    this.authService.login(this.form.getRawValue() as { username: string; password: string }).subscribe({
-      next: () => this.router.navigate(['/dashboard']),
+    const { username, password } = this.form.getRawValue();
+    this.authService.login({ username: username!.trim(), password: password! }).subscribe({
+      next: () => {
+        this.loading = false;
+        this.router.navigate([this.authService.homeRoute()]);
+      },
       error: () => {
-        this.error = 'Invalid username or password.';
+        this.authService.clearSession();
+        this.error = 'Identifiants invalides. Essayez demo / Demo123! ou admin / Admin123!';
         this.loading = false;
       }
     });

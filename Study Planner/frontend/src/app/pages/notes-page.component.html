@@ -1,0 +1,81 @@
+<div class="app-shell">
+  <header class="page-header">
+    <div class="page-header__copy">
+      <span class="section-label">Étudiant</span>
+      <h1 class="page-title display-sm">Mes notes</h1>
+      <p class="page-subtitle text-secondary">Carnet de notes et moyenne par matière — /20</p>
+    </div>
+    <div class="metric-card app-card w-fit">
+      <p class="card-title">Moyenne</p>
+      <p class="metric metric--sm">{{ averageGrade() }}<span>/20</span></p>
+    </div>
+  </header>
+
+  @if (message) {
+    <div class="alert alert-success mb-4">{{ message }}</div>
+  }
+
+  <div class="layout-with-ads">
+    <div class="layout-main">
+      <div class="app-card mb-4">
+        <p class="card-title">{{ editingId ? 'Modifier la note' : 'Nouvelle note' }}</p>
+        <div class="form-shell">
+          <div class="form-field">
+            <label>Titre</label>
+            <input class="form-control" [(ngModel)]="title" placeholder="Ex. Contrôle maths ch.3" />
+          </div>
+          <div class="form-field">
+            <label>Matière</label>
+            <select class="form-select" [(ngModel)]="subjectId">
+              <option [ngValue]="null">— Aucune —</option>
+              @for (s of subjects; track s.id) {
+                <option [ngValue]="s.id">{{ s.name }}</option>
+              }
+            </select>
+          </div>
+          <div class="form-field">
+            <label>Note /20</label>
+            <input class="form-control" type="number" min="0" max="20" step="0.25" [(ngModel)]="grade" />
+          </div>
+          <div class="form-field">
+            <label>Contenu</label>
+            <textarea class="form-control" [(ngModel)]="content" rows="3"></textarea>
+          </div>
+          <div class="d-flex gap-2">
+            <button class="btn-primary" type="button" (click)="save()">
+              {{ editingId ? 'Mettre à jour' : 'Ajouter' }}
+            </button>
+            @if (editingId) {
+              <button class="btn-secondary" type="button" (click)="resetForm()">Annuler</button>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="notes-grid">
+        @for (note of notes; track note.id) {
+          <article class="app-card note-card">
+            <div class="d-flex space-between align-center">
+              <h3 class="h3 mb-0">{{ note.title }}</h3>
+              @if (note.grade != null) {
+                <span class="tag tag--grade">{{ note.grade }}/20</span>
+              }
+            </div>
+            @if (note.subjectName) {
+              <p class="text-muted">{{ note.subjectName }}</p>
+            }
+            @if (note.content) {
+              <p class="text-secondary">{{ note.content }}</p>
+            }
+            <div class="d-flex gap-2 mt-3">
+              <button class="btn-ghost btn-ghost--sm" type="button" (click)="edit(note)">Modifier</button>
+              <button class="btn-outline-danger btn-ghost--sm" type="button" (click)="remove(note.id)">Supprimer</button>
+            </div>
+          </article>
+        } @empty {
+          <p class="text-muted">Aucune note — ajoutez votre première évaluation.</p>
+        }
+      </div>
+    </div>
+  </div>
+</div>

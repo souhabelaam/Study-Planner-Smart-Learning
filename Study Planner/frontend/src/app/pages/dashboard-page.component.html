@@ -1,39 +1,50 @@
 <div class="app-shell">
-  <h1 class="page-title">Dashboard</h1>
-  <p class="page-subtitle">Overview of your study activity and AI insights.</p>
-  <div class="app-grid">
-    <div class="app-card">
-      <p class="card-title">Subjects</p>
+  <header class="page-header">
+    <div class="page-header__copy">
+      <span class="section-label">Vue d'ensemble</span>
+      <h1 class="page-title display-sm">Tableau de bord</h1>
+      <p class="page-subtitle text-secondary">Votre activité et les insights IA en un coup d'œil.</p>
+    </div>
+    <a routerLink="/lab" class="btn-primary">Smart Lab →</a>
+  </header>
+
+  <div class="app-grid metric-grid">
+    <div class="app-card metric-card">
+      <p class="card-title">Matières</p>
       <p class="metric">{{ subjectCount }}</p>
     </div>
-    <div class="app-card">
+    <div class="app-card metric-card">
       <p class="card-title">Sessions</p>
       <p class="metric">{{ sessionCount }}</p>
     </div>
-    <div class="app-card">
-      <p class="card-title">AI score</p>
+    <div class="app-card metric-card metric-card--highlight">
+      <p class="card-title">Score IA</p>
       <p class="metric">{{ score }}</p>
+      <span class="tag">Productivité</span>
     </div>
   </div>
 
-  <div class="app-card mt-3 chart-card">
-    <div class="d-flex align-center space-between">
-      <p class="card-title mb-0">Daily study time (7 days)</p>
-      <span class="tag">AI insight</span>
-    </div>
+  <div class="app-card chart-card section-block">
+    <header class="card-header">
+      <div>
+        <p class="card-title mb-0">Temps d'étude — 7 jours</p>
+        <p class="text-quaternary mb-0">Minutes par jour</p>
+      </div>
+      <span class="tag">Insight IA</span>
+    </header>
     <div class="chart-wrap">
       <canvas #dailyCanvas></canvas>
     </div>
   </div>
 
   @if (report) {
-  <div class="app-card mt-3">
-    <p class="card-title">AI suggestions</p>
-    <ul class="tips-list">
-      @for (tip of report.suggestions; track tip) {
-      <li>{{ tip }}</li>
-      }
-    </ul>
-  </div>
+    <div class="app-card section-block">
+      <p class="card-title">Suggestions IA</p>
+      <ul class="tips-list">
+        @for (tip of report.suggestions; track tip) {
+          <li>{{ tip }}</li>
+        }
+      </ul>
+    </div>
   }
 </div>

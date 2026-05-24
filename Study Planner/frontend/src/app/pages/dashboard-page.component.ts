@@ -8,7 +8,7 @@ import {
   ViewChild,
   inject
 } from '@angular/core';
-import { NavigationEnd, Router } from '@angular/router';
+import { NavigationEnd, Router, RouterLink } from '@angular/router';
 import { filter, skip } from 'rxjs/operators';
 import { ApiService } from '../core/api.service';
 import { Chart } from 'chart.js/auto';
@@ -17,6 +17,7 @@ import { ProductivityReport } from '../core/models';
 @Component({
   standalone: true,
   selector: 'app-dashboard-page',
+  imports: [RouterLink],
   templateUrl: './dashboard-page.component.html'
 })
 export class DashboardPageComponent implements OnInit, AfterViewInit, OnDestroy {

@@ -1,49 +1,53 @@
 <div class="app-shell auth-shell">
-  <div class="auth-hero">
-    <h1 class="auth-title">Create your account</h1>
-    <p class="auth-subtitle">Start planning your sessions and get AI-powered insights.</p>
-  </div>
-  <div class="app-card auth-card">
-    <h2 class="mb-0">Register</h2>
-    @if (error) {
-    <div class="alert alert-danger">{{ error }}</div>
-    }
-    <form class="form-shell" [formGroup]="form" (ngSubmit)="submit()">
-      <div>
-        <label>Username</label>
-        <input class="form-control" formControlName="username" />
-      </div>
-      <div>
-        <label>Email</label>
-        <input class="form-control" type="email" formControlName="email" />
-      </div>
-      <div>
-        <label>Password</label>
-        <div class="password-input-wrapper">
-          <input class="form-control" [type]="showPassword ? 'text' : 'password'" formControlName="password" />
-          <button type="button" class="password-toggle" (click)="togglePasswordVisibility()" tabindex="-1" [title]="showPassword ? 'Hide password' : 'Show password'">
-            <span *ngIf="!showPassword" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"></path>
-                <circle cx="12" cy="12" r="3"></circle>
-              </svg>
-            </span>
-            <span *ngIf="showPassword" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M3 3l18 18"></path>
-                <path d="M10.58 10.58A3 3 0 0 0 12 15a3 3 0 0 0 1.42-.35"></path>
-                <path d="M9.88 5.14A11.2 11.2 0 0 1 12 5c7 0 10.5 7 10.5 7a19.5 19.5 0 0 1-4.03 5.06"></path>
-                <path d="M6.23 6.23C3.67 7.85 1.5 12 1.5 12s3.5 7 10.5 7c1.45 0 2.8-.2 4.03-.58"></path>
-              </svg>
-            </span>
-          </button>
+  <div class="auth-layout">
+    <div class="auth-aside" aria-hidden="true">
+      <span class="section-label">Commencer</span>
+      <h2 class="h2">Rejoignez Study Planner</h2>
+      <p class="text-secondary">Planifiez, mesurez et progressez avec un parcours sans friction.</p>
+    </div>
+
+    <div class="auth-panel app-card">
+      <header class="auth-panel__head">
+        <h1 class="auth-title display-sm">Créer un compte</h1>
+        <p class="auth-subtitle text-secondary">Quelques champs — puis accès au Smart Lab.</p>
+      </header>
+
+      @if (error) {
+        <div class="alert alert-danger" role="alert">{{ error }}</div>
+      }
+
+      <form class="form-shell" [formGroup]="form" (ngSubmit)="submit()">
+        <div class="form-field">
+          <label for="reg-username">Nom d'utilisateur</label>
+          <input id="reg-username" class="form-control" formControlName="username" autocomplete="username" />
         </div>
-      </div>
-      <button class="btn-primary" type="submit" [disabled]="loading">Create account</button>
-    </form>
-    <p class="mt-3">
-      Already registered?
-      <a class="cta-link" routerLink="/login">Back to login</a>
-    </p>
+        <div class="form-field">
+          <label for="reg-email">Email</label>
+          <input id="reg-email" class="form-control" type="email" formControlName="email" autocomplete="email" />
+        </div>
+        <div class="form-field">
+          <label for="reg-password">Mot de passe</label>
+          <div class="password-input-wrapper">
+            <input id="reg-password" class="form-control" [type]="showPassword ? 'text' : 'password'" formControlName="password" autocomplete="new-password" />
+            <button type="button" class="password-toggle" (click)="togglePasswordVisibility()" tabindex="-1" [attr.aria-label]="showPassword ? 'Masquer' : 'Afficher'">
+              <span *ngIf="!showPassword" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+              </span>
+              <span *ngIf="showPassword" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3l18 18"/></svg>
+              </span>
+            </button>
+          </div>
+        </div>
+        <button class="btn-primary btn-lg btn-block" type="submit" [disabled]="loading">
+          {{ loading ? 'Création…' : 'Créer mon compte' }}
+        </button>
+      </form>
+
+      <p class="auth-footer text-secondary">
+        Déjà inscrit ?
+        <a class="link-arrow" routerLink="/login">Se connecter</a>
+      </p>
+    </div>
   </div>
 </div>

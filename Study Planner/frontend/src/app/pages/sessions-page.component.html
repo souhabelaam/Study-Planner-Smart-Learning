@@ -1,6 +1,11 @@
 <div class="app-shell">
-  <h1 class="page-title">Sessions</h1>
-  <p class="page-subtitle">Plan sessions and keep your study streak going.</p>
+  <header class="page-header">
+    <div class="page-header__copy">
+      <span class="section-label">Activité</span>
+      <h1 class="page-title display-sm">Sessions</h1>
+      <p class="page-subtitle text-secondary">Planifiez vos sessions et maintenez votre série.</p>
+    </div>
+  </header>
   <div class="app-card mb-4">
     <form class="form-shell" (ngSubmit)="create()">
       <select class="form-select" [(ngModel)]="subjectId" name="subjectId" required>

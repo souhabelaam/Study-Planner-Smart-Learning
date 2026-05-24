@@ -1,0 +1,195 @@
+<div class="app-shell lab-shell">
+  <header class="page-header">
+    <div class="page-header__copy">
+      <span class="section-label">Innovation</span>
+      <h1 class="page-title display-sm">Smart Lab</h1>
+      <p class="page-subtitle text-secondary">Six outils — une interface claire, une action à la fois.</p>
+    </div>
+    <a routerLink="/dashboard" class="btn-secondary">← Dashboard</a>
+  </header>
+
+  <nav class="lab-tabs" aria-label="Smart Lab sections">
+    @for (t of tabs; track t.id) {
+      <button
+        type="button"
+        class="lab-tab"
+        [class.is-active]="activeTab === t.id"
+        (click)="setTab(t.id)"
+      >
+        <span>{{ t.icon }}</span> {{ t.label }}
+      </button>
+    }
+  </nav>
+
+  @if (activeTab === 'streaks') {
+    <div class="app-grid compact-grid">
+      <div class="app-card">
+        <p class="card-title">Série actuelle</p>
+        <p class="metric">{{ streaks?.currentStreak ?? 0 }}</p>
+        <span class="text-muted">jours consécutifs</span>
+      </div>
+      <div class="app-card">
+        <p class="card-title">Record</p>
+        <p class="metric">{{ streaks?.longestStreak ?? 0 }}</p>
+        <span class="text-muted">meilleure série</span>
+      </div>
+      <div class="app-card">
+        <p class="card-title">Aujourd'hui</p>
+        <p class="metric">{{ streaks?.todayMinutes ?? 0 }}</p>
+        <span class="text-muted">minutes étudiées</span>
+      </div>
+      <div class="app-card">
+        <p class="card-title">Objectif</p>
+        <p class="metric">{{ streaks?.goalProgressPercent ?? 0 }}%</p>
+        <span class="text-muted">du quota quotidien</span>
+      </div>
+    </div>
+    <div class="app-card mt-3">
+      <p class="card-title">Objectif quotidien (minutes)</p>
+      <div class="d-flex gap-2 align-center">
+        <input class="form-control w-fit" type="number" min="15" max="480" [(ngModel)]="goalInput" />
+        <button class="btn-primary" type="button" (click)="saveGoal()">Enregistrer</button>
+      </div>
+      <div class="goal-bar mt-3">
+        <div class="goal-bar-fill" [style.width.%]="streaks?.goalProgressPercent ?? 0"></div>
+      </div>
+    </div>
+  }
+
+  @if (activeTab === 'focus') {
+    <div class="app-card focus-card">
+      <p class="card-title">Pomodoro Focus</p>
+      <p class="focus-timer">{{ formatFocus() }}</p>
+      <div class="form-shell mb-4">
+        <label class="text-muted">Matière</label>
+        <select class="form-select" [(ngModel)]="focusSubjectId">
+          <option [ngValue]="null">— Choisir —</option>
+          @for (s of subjects; track s.id) {
+            <option [ngValue]="s.id">{{ s.name }}</option>
+          }
+        </select>
+      </div>
+      <div class="d-flex gap-2">
+        <button class="btn-primary" type="button" (click)="toggleFocus()">
+          {{ focusRunning ? 'Pause' : 'Démarrer' }}
+        </button>
+        <button class="btn-ghost" type="button" (click)="resetFocus()">Réinitialiser</button>
+      </div>
+      @if (focusMessage) {
+        <p class="alert alert-success mt-3">{{ focusMessage }}</p>
+      }
+    </div>
+  }
+
+  @if (activeTab === 'planner') {
+    @if (plan) {
+      <div class="app-card mb-4">
+        <p class="card-title">Résumé IA</p>
+        <p>{{ plan.summary }}</p>
+      </div>
+      <div class="planner-grid">
+        @for (day of plan.days; track day.date) {
+          <article class="app-card planner-day">
+            <h3>{{ day.dayLabel }}</h3>
+            <p class="text-muted">{{ day.date }}</p>
+            <p><strong>{{ day.recommendedMinutes }} min</strong> · {{ day.focusSubjects.join(', ') }}</p>
+            <p class="planner-tip">{{ day.tip }}</p>
+          </article>
+        }
+      </div>
+    } @else {
+      <p class="text-muted">Chargement du plan…</p>
+    }
+  }
+
+  @if (activeTab === 'heatmap') {
+    <div class="app-card">
+      <p class="card-title">Heatmap — 12 semaines</p>
+      <p class="text-muted mb-4">Intensité = minutes étudiées par jour</p>
+      <div class="heatmap-legend">
+        <span>Peu</span>
+        <span class="heat-cell lvl-0"></span>
+        <span class="heat-cell lvl-1"></span>
+        <span class="heat-cell lvl-2"></span>
+        <span class="heat-cell lvl-3"></span>
+        <span class="heat-cell lvl-4"></span>
+        <span>Beaucoup</span>
+      </div>
+      <div class="heatmap-grid">
+        @for (week of heatmapWeeks(); track $index) {
+          <div class="heatmap-week">
+            @for (cell of week; track cell.date) {
+              <span
+                class="heat-cell"
+                [class.lvl-0]="heatLevel(cell.minutes) === 'lvl-0'"
+                [class.lvl-1]="heatLevel(cell.minutes) === 'lvl-1'"
+                [class.lvl-2]="heatLevel(cell.minutes) === 'lvl-2'"
+                [class.lvl-3]="heatLevel(cell.minutes) === 'lvl-3'"
+                [class.lvl-4]="heatLevel(cell.minutes) === 'lvl-4'"
+                [title]="cell.date + ' : ' + cell.minutes + ' min'"
+              ></span>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  @if (activeTab === 'badges') {
+    <div class="badges-grid">
+      @for (b of badges; track b.id) {
+        <article class="app-card badge-card" [class.is-unlocked]="b.unlocked">
+          <span class="badge-icon">{{ b.icon }}</span>
+          <h3>{{ b.title }}</h3>
+          <p class="text-muted">{{ b.description }}</p>
+          <div class="goal-bar">
+            <div class="goal-bar-fill" [style.width.%]="badgeProgress(b)"></div>
+          </div>
+          <span class="tag">{{ b.unlocked ? 'Débloqué' : b.progress + ' / ' + b.target }}</span>
+        </article>
+      }
+    </div>
+  }
+
+  @if (activeTab === 'quiz') {
+    <div class="app-card mb-4">
+      <p class="card-title">Quiz intelligent par matière</p>
+      <div class="d-flex gap-2 align-end">
+        <select class="form-select" [(ngModel)]="quizSubjectId">
+          <option [ngValue]="null">— Matière —</option>
+          @for (s of subjects; track s.id) {
+            <option [ngValue]="s.id">{{ s.name }}</option>
+          }
+        </select>
+        <button class="btn-primary" type="button" (click)="generateQuiz()" [disabled]="!quizSubjectId">
+          Générer
+        </button>
+      </div>
+    </div>
+
+    @if (quiz && !quizFinished && currentQuestion(); as q) {
+      <div class="app-card">
+        <p class="card-title">{{ quiz.subjectName }} — Question {{ quizIndex + 1 }}/{{ quiz.questions.length }}</p>
+        <h3>{{ q.question }}</h3>
+        <div class="quiz-options">
+          @for (opt of q.options; track opt; let i = $index) {
+            <label class="quiz-option" [class.is-selected]="quizSelected === i">
+              <input type="radio" name="quizOpt" [checked]="quizSelected === i" (change)="selectQuizOption(i)" />
+              {{ opt }}
+            </label>
+          }
+        </div>
+        <button class="btn-primary mt-3" type="button" (click)="submitQuizAnswer()" [disabled]="quizSelected === null">
+          Valider
+        </button>
+      </div>
+    }
+
+    @if (quizFinished && quiz) {
+      <div class="app-card">
+        <h3>Résultat : {{ quizScore }} / {{ quiz.questions.length }}</h3>
+        <p class="text-muted">Bravo ! Continuez pour débloquer plus de badges.</p>
+      </div>
+    }
+  }
+</div>

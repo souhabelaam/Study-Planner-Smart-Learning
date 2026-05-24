@@ -1,0 +1,128 @@
+<div class="app-shell admin-shell">
+  <header class="page-header">
+    <div class="page-header__copy">
+      <span class="section-label">Administration</span>
+      <h1 class="page-title display-sm">Console admin</h1>
+      <p class="page-subtitle text-secondary">Utilisateurs, publicités et statistiques globales.</p>
+    </div>
+  </header>
+
+  @if (overview) {
+    <div class="app-grid compact-grid mb-4">
+      <div class="app-card metric-card">
+        <p class="card-title">Utilisateurs</p>
+        <p class="metric">{{ overview.totalUsers }}</p>
+      </div>
+      <div class="app-card metric-card">
+        <p class="card-title">Étudiants</p>
+        <p class="metric">{{ overview.totalStudents }}</p>
+      </div>
+      <div class="app-card metric-card">
+        <p class="card-title">Sessions</p>
+        <p class="metric">{{ overview.totalSessions }}</p>
+      </div>
+      <div class="app-card metric-card">
+        <p class="card-title">Moy. notes</p>
+        <p class="metric metric--sm">{{ overview.averageGrade }}<span>/20</span></p>
+      </div>
+    </div>
+  }
+
+  <section class="app-card section-block">
+    <header class="card-header">
+      <div>
+        <p class="card-title mb-0">Utilisateurs</p>
+        <input class="form-control mt-3" placeholder="Rechercher…" [(ngModel)]="userFilter" />
+      </div>
+    </header>
+    <table class="app-table">
+      <thead>
+        <tr>
+          <th>Utilisateur</th>
+          <th>Email</th>
+          <th>Rôle</th>
+          <th>Sessions</th>
+          <th>Notes</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (u of filteredUsers(); track u.id) {
+          @if (editingUserId === u.id) {
+            <tr>
+              <td>
+                <input class="form-control" [(ngModel)]="userForm.username" style="padding: var(--space-1) var(--space-2); font-size: var(--text-sm);" />
+              </td>
+              <td>
+                <input class="form-control" [(ngModel)]="userForm.email" style="padding: var(--space-1) var(--space-2); font-size: var(--text-sm);" />
+              </td>
+              <td>
+                <select class="form-select" [(ngModel)]="userForm.role" style="padding: var(--space-1) var(--space-2); font-size: var(--text-sm); width: auto;" [disabled]="isCurrentUser(u.username)">
+                  <option value="USER">Étudiant</option>
+                  <option value="ADMIN">Admin</option>
+                </select>
+              </td>
+              <td>{{ u.sessionCount }}</td>
+              <td>{{ u.noteCount }}</td>
+              <td>
+                @if (userError) {
+                  <span style="color: var(--danger); font-size: var(--text-xs); display: block; margin-bottom: var(--space-1);">{{ userError }}</span>
+                }
+                <div class="d-flex gap-2">
+                  <button class="btn-primary" style="padding: var(--space-1) var(--space-3); font-size: var(--text-xs);" (click)="saveUser()">Sauvegarder</button>
+                  <button class="btn-secondary" style="padding: var(--space-1) var(--space-3); font-size: var(--text-xs);" (click)="cancelEditUser()">Annuler</button>
+                </div>
+              </td>
+            </tr>
+          } @else {
+            <tr>
+              <td>{{ u.username }}</td>
+              <td>{{ u.email }}</td>
+              <td><span class="tag">{{ roleLabel(u.roles) }}</span></td>
+              <td>{{ u.sessionCount }}</td>
+              <td>{{ u.noteCount }}</td>
+              <td>
+                <div class="d-flex gap-2">
+                  <button class="btn-ghost btn-ghost--sm" style="padding: var(--space-1) var(--space-2); font-size: var(--text-xs);" (click)="editUser(u)">Modifier</button>
+                  <button class="btn-outline-danger btn-ghost--sm" style="padding: var(--space-1) var(--space-2); font-size: var(--text-xs);" [disabled]="isCurrentUser(u.username)" (click)="deleteUser(u.id)">Supprimer</button>
+                </div>
+              </td>
+            </tr>
+          }
+        }
+      </tbody>
+    </table>
+  </section>
+
+  <section class="app-card section-block">
+    <p class="card-title">Espace publicitaire (étudiants)</p>
+    <div class="admin-ad-form form-shell mb-4">
+      <input class="form-control" placeholder="Titre" [(ngModel)]="adForm.title" />
+      <textarea class="form-control" placeholder="Description" [(ngModel)]="adForm.description" rows="2"></textarea>
+      <input class="form-control" placeholder="Lien (URL ou /lab)" [(ngModel)]="adForm.linkUrl" />
+      <label class="d-flex align-center gap-2">
+        <input type="checkbox" [(ngModel)]="adForm.active" /> Active
+      </label>
+      <div class="d-flex gap-2">
+        <button class="btn-primary" type="button" (click)="saveAd()">
+          {{ editingAdId ? 'Mettre à jour' : 'Publier' }}
+        </button>
+        @if (editingAdId) {
+          <button class="btn-secondary" type="button" (click)="resetAdForm()">Annuler</button>
+        }
+      </div>
+    </div>
+    <div class="notes-grid">
+      @for (ad of ads; track ad.id) {
+        <article class="app-card" [class.opacity-muted]="!ad.active">
+          <h3 class="h3">{{ ad.title }}</h3>
+          <p class="text-secondary">{{ ad.description }}</p>
+          <div class="d-flex gap-2 mt-3">
+            <button class="btn-ghost btn-ghost--sm" type="button" (click)="editAd(ad)">Modifier</button>
+            <button class="btn-outline-danger btn-ghost--sm" type="button" (click)="removeAd(ad.id)">Supprimer</button>
+          </div>
+        </article>
+      }
+    </div>
+  </section>
+</div>

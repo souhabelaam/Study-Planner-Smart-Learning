@@ -1,0 +1,57 @@
+<div class="app-shell">
+  <header class="page-header">
+    <div class="page-header__copy">
+      <span class="section-label">Mini-jeu</span>
+      <h1 class="page-title display-sm">Memory Study</h1>
+      <p class="page-subtitle text-secondary">Retrouvez les paires — moins de coups et moins de temps = meilleur score.</p>
+    </div>
+    @if (myBest) {
+      <div class="app-card w-fit">
+        <p class="card-title">Record</p>
+        <p class="metric metric--sm">{{ myBest.score }}</p>
+      </div>
+    }
+  </header>
+
+  <div class="game-layout">
+    <div class="app-card game-board-card">
+      <div class="d-flex space-between align-center mb-4">
+        <span class="tag">Coups : {{ moves }}</span>
+        <span class="tag">Temps : {{ seconds }}s</span>
+        @if (finished) {
+          <span class="tag tag--grade">Score : {{ score }}</span>
+        }
+      </div>
+      <div class="memory-grid">
+        @for (card of cards; track card.id) {
+          <button
+            type="button"
+            class="memory-card"
+            [class.is-flipped]="card.flipped || card.matched"
+            [class.is-matched]="card.matched"
+            (click)="flip(card)"
+            [disabled]="!playing || card.matched"
+          >
+            <span class="memory-front">?</span>
+            <span class="memory-back">{{ card.emoji }}</span>
+          </button>
+        }
+      </div>
+      <button class="btn-primary mt-4" type="button" (click)="startGame()">Nouvelle partie</button>
+    </div>
+
+    <aside class="app-card">
+      <p class="card-title">Classement</p>
+      <ol class="leaderboard-list">
+        @for (entry of leaderboard; track entry.id; let i = $index) {
+          <li>
+            <span>#{{ i + 1 }} {{ entry.username }}</span>
+            <strong>{{ entry.score }}</strong>
+          </li>
+        } @empty {
+          <li class="text-muted">Jouez pour apparaître au classement.</li>
+        }
+      </ol>
+    </aside>
+  </div>
+</div>

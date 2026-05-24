@@ -1,0 +1,10 @@
+{
+  "name": "study-planner",
+  "private": true,
+  "scripts": {
+    "server": "npm run dev --prefix server",
+    "server:start": "npm start --prefix server",
+    "frontend": "npm start --prefix frontend",
+    "seed": "npm run seed --prefix server"
+  }
+}
