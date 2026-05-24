@@ -6,42 +6,50 @@
       <p class="page-subtitle text-secondary">Tendances, progression et insights générés par l'IA.</p>
     </div>
   </header>
-  <div class="app-grid mb-4">
-    <div class="app-card">
-      <p class="card-title">Last 7 days</p>
-      <div class="chart-wrap">
-        <canvas #dailyCanvas></canvas>
+
+  @if (loading) {
+    <div class="app-card" style="text-align:center; padding: var(--space-8);">
+      <p class="text-muted">Chargement des données…</p>
+    </div>
+  } @else {
+    <div class="app-grid mb-4">
+      <div class="app-card">
+        <p class="card-title">7 derniers jours</p>
+        <div class="chart-wrap">
+          <canvas #dailyCanvas></canvas>
+        </div>
+      </div>
+      <div class="app-card">
+        <p class="card-title">8 dernières semaines</p>
+        <div class="chart-wrap">
+          <canvas #weeklyCanvas></canvas>
+        </div>
       </div>
     </div>
-    <div class="app-card">
-      <p class="card-title">Last 8 weeks</p>
-      <div class="chart-wrap">
-        <canvas #weeklyCanvas></canvas>
+
+    @if (report) {
+      <div class="app-card">
+        <p class="card-title">Analyse IA</p>
+        <div class="app-grid compact-grid mb-4">
+          <div class="app-card" style="background: var(--surface-2); text-align: center;">
+            <p class="metric-sm">{{ report.mostActiveHour }}h</p>
+            <p class="text-muted">Heure la plus active</p>
+          </div>
+          <div class="app-card" style="background: var(--surface-2); text-align: center;">
+            <p class="metric-sm">{{ report.consistencyScore }}<span style="font-size: var(--text-sm); opacity: 0.6;">/10</span></p>
+            <p class="text-muted">Score de régularité</p>
+          </div>
+          <div class="app-card" style="background: var(--surface-2); text-align: center;">
+            <p class="metric-sm">{{ report.productivityScore }}<span style="font-size: var(--text-sm); opacity: 0.6;">/10</span></p>
+            <p class="text-muted">Score de productivité</p>
+          </div>
+        </div>
+        <ul class="tips-list">
+          @for (tip of report.suggestions; track tip) {
+            <li>{{ tip }}</li>
+          }
+        </ul>
       </div>
-    </div>
-  </div>
-  @if (report) {
-  <div class="app-card">
-    <p class="card-title">AI analysis</p>
-    <div class="app-grid compact-grid">
-      <div>
-        <p class="metric-sm">{{ report.mostActiveHour }}h</p>
-        <p class="text-muted">Most active hour</p>
-      </div>
-      <div>
-        <p class="metric-sm">{{ report.consistencyScore }}</p>
-        <p class="text-muted">Consistency score /10</p>
-      </div>
-      <div>
-        <p class="metric-sm">{{ report.productivityScore }}</p>
-        <p class="text-muted">Productivity score /10</p>
-      </div>
-    </div>
-    <ul class="tips-list">
-      @for (tip of report.suggestions; track tip) {
-      <li>{{ tip }}</li>
-      }
-    </ul>
-  </div>
+    }
   }
 </div>
